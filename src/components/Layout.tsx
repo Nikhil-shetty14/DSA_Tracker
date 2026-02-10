@@ -10,7 +10,8 @@ import {
     Moon,
     Sun,
     User,
-    LogOut
+    LogOut,
+    BrainCircuit
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -33,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: '/dashboard', label: 'Dashboard', icon: BarChart2 },
         { path: '/journal', label: 'Journal', icon: BookOpen },
         { path: '/badges', label: 'Badges', icon: Trophy },
+        { path: '/aptitude-test', label: 'Test Yourself', icon: BrainCircuit },
         { path: '/profile', label: 'Profile', icon: User },
     ];
 

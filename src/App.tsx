@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
 import Profile from './pages/Profile';
 import BadgesPage from './pages/Badges';
+import AptitudeTest from './pages/AptitudeTest';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -45,6 +46,11 @@ function App() {
             <Route path="/badges" element={
               <ProtectedRoute>
                 <Layout><BadgesPage /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/aptitude-test" element={
+              <ProtectedRoute>
+                <Layout><AptitudeTest /></Layout>
               </ProtectedRoute>
             } />
           </Routes>

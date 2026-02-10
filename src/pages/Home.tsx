@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { quotes } from '../data/quotes';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { useFirestoreStreak } from '../hooks/useFirestore';
+import { useAuth } from '../context/AuthContext';
 import { Flame, Target, Edit2, Save } from 'lucide-react';
 import Badges from '../components/Badges';
 
@@ -15,6 +16,7 @@ const Home: React.FC = () => {
     const [isEditingReason, setIsEditingReason] = useState(false);
     const [tempReason, setTempReason] = useState(reason);
     const { streak } = useFirestoreStreak();
+    const { user } = useAuth();
 
     const handleSaveReason = () => {
         setReason(tempReason);
@@ -26,7 +28,7 @@ const Home: React.FC = () => {
             {/* Welcome Section */}
             <section className="space-y-2">
                 <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-                    Keep Grinding, Student!
+                    Keep Grinding, {user?.email ? user.email.split('@')[0].split(/[._-]/)[0].charAt(0).toUpperCase() + user.email.split('@')[0].split(/[._-]/)[0].slice(1).toLowerCase() : 'Champ'}!
                 </h1>
                 <p className="text-muted-foreground text-lg">
                     Consistency is the key to mastering Data Structures & Algorithms.

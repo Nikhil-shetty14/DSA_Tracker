@@ -102,3 +102,16 @@ export function useJournal() {
 export function useProfile() {
     return useFirestore<{ bio: string; location: string }>('profile', { bio: '', location: '' });
 }
+
+// Hook for quiz results
+export interface QuizResult {
+    topicId: string;
+    score: number;
+    total: number;
+    date: string;
+    timeTaken: number; // seconds
+}
+
+export function useQuizResults() {
+    return useFirestore<QuizResult[]>('quizResults', []);
+}

@@ -1,10 +1,10 @@
 import React from 'react';
-import { useStreak } from '../hooks/useStreak';
+import { useFirestoreStreak } from '../hooks/useFirestore';
 import { Star, Zap, Flame } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const Badges: React.FC = () => {
-    const { streak } = useStreak();
+    const { streak } = useFirestoreStreak();
     // Mock total solved for now, in real app would come from context
     const totalSolved = 0;
 

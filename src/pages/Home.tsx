@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { quotes } from '../data/quotes';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { useStreak } from '../hooks/useStreak';
+import { useFirestoreStreak } from '../hooks/useFirestore';
 import { Flame, Target, Edit2, Save } from 'lucide-react';
 import Badges from '../components/Badges';
 
@@ -14,7 +14,7 @@ const Home: React.FC = () => {
     const [reason, setReason] = useLocalStorage<string>('dsa-reason', '');
     const [isEditingReason, setIsEditingReason] = useState(false);
     const [tempReason, setTempReason] = useState(reason);
-    const { streak } = useStreak();
+    const { streak } = useFirestoreStreak();
 
     const handleSaveReason = () => {
         setReason(tempReason);

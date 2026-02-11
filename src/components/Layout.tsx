@@ -12,14 +12,11 @@ import {
     User,
     LogOut,
     BrainCircuit,
-    Bot,
-    Sparkles
+    Bot
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
-import { useXP } from '../hooks/useFirestore';
-import { getLevelProgress } from '../lib/xpSystem';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -30,8 +27,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { theme, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
     const location = useLocation();
-    const { xpData } = useXP();
-    const levelProgress = getLevelProgress(xpData.totalXP);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -97,26 +92,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </nav>
 
                 <div className="absolute bottom-8 left-0 w-full px-6 space-y-2">
-                    {/* XP Level Indicator */}
-                    <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 mb-2">
-                        <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-sm">{levelProgress.currentLevel.emoji}</span>
-                                <span className="text-xs font-semibold">{levelProgress.currentLevel.title}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Sparkles className="w-3 h-3 text-yellow-400" />
-                                <span className="text-xs font-medium text-yellow-400">{xpData.totalXP}</span>
-                            </div>
-                        </div>
-                        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                            <div
-                                className={cn("h-full rounded-full transition-all duration-700 bg-gradient-to-r", levelProgress.currentLevel.color)}
-                                style={{ width: `${levelProgress.progressPercent}%` }}
-                            />
-                        </div>
-                    </div>
-
                     {/* User Info */}
                     {user && (
                         <div className="px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 mb-2">

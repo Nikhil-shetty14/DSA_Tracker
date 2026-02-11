@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { topics, type Topic } from '../data/topics';
-import { useProgress, useFirestoreStreak } from '../hooks/useFirestore';
-import { BarChart2, Plus, Minus, Flame, Trophy, Target, TrendingUp } from 'lucide-react';
+import { useProgress, useFirestoreStreak, useXP } from '../hooks/useFirestore';
+import { BarChart2, Plus, Minus, Flame, Trophy, Target, TrendingUp, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { XP_REWARDS, getLevelProgress, getStreakXP } from '../lib/xpSystem';
 
 const Dashboard: React.FC = () => {
     const [progress, setProgress] = useProgress();
     const { streak, updateStreak } = useFirestoreStreak();
-    const [totalGoals] = React.useState<{ [key: string]: number }>({});
+    const { xpData, addXP } = useXP();
+    const [totalGoals] = useState<{ [key: string]: number }>({});
+    const [xpAnimation, setXpAnimation] = useState<{ amount: number; key: number } | null>(null);
+
+    const levelProgress = getLevelProgress(xpData.totalXP);
+
+    const showXPGain = (amount: number) => {
+        setXpAnimation({ amount, key: Date.now() });
+        setTimeout(() => setXpAnimation(null), 1500);
+    };
 
     const updateProgress = (topicId: string, delta: number) => {
         setProgress(prev => {
@@ -19,6 +29,18 @@ const Dashboard: React.FC = () => {
         // Update streak when adding a problem
         if (delta > 0) {
             updateStreak();
+            // Award XP for solving a problem
+            addXP(XP_REWARDS.SOLVE_PROBLEM);
+            showXPGain(XP_REWARDS.SOLVE_PROBLEM);
+            // Award streak XP if it's a new day
+            const today = new Date().toLocaleDateString();
+            if (streak.lastLogDate !== today) {
+                const streakXP = getStreakXP(streak.currentStreak + 1);
+                setTimeout(() => {
+                    addXP(streakXP);
+                    showXPGain(streakXP);
+                }, 800);
+            }
         }
     };
 
@@ -48,7 +70,37 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {/* XP & Level Card */}
+                <div className="relative bg-gradient-to-br from-indigo-500/10 to-violet-600/10 border border-indigo-500/20 p-4 rounded-xl overflow-hidden">
+                    {xpAnimation && (
+                        <div
+                            key={xpAnimation.key}
+                            className="absolute top-2 right-3 text-sm font-bold text-green-400 animate-bounce"
+                        >
+                            +{xpAnimation.amount} XP
+                        </div>
+                    )}
+                    <div className="flex items-center gap-2 text-indigo-500 mb-2">
+                        <Sparkles className="w-5 h-5" />
+                        <span className="text-sm font-medium">Level {levelProgress.currentLevel.level}</span>
+                    </div>
+                    <div className="text-xl font-bold flex items-center gap-1.5">
+                        <span>{levelProgress.currentLevel.emoji}</span>
+                        <span className="text-lg">{levelProgress.currentLevel.title}</span>
+                    </div>
+                    <div className="mt-2">
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                            <div
+                                className={cn("h-full rounded-full transition-all duration-700 bg-gradient-to-r", levelProgress.currentLevel.color)}
+                                style={{ width: `${levelProgress.progressPercent}%` }}
+                            />
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                            {xpData.totalXP} XP{levelProgress.nextLevel ? ` / ${levelProgress.nextLevel.minXP} XP` : ' — MAX!'}
+                        </div>
+                    </div>
+                </div>
                 <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 p-4 rounded-xl">
                     <div className="flex items-center gap-2 text-blue-500 mb-2">
                         <Target className="w-5 h-5" />

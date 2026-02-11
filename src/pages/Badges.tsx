@@ -1,11 +1,12 @@
 import React from 'react';
-import { useProgress, useFirestoreStreak, useJournal } from '../hooks/useFirestore';
+import { useProgress, useFirestoreStreak, useJournal, useXP } from '../hooks/useFirestore';
 import {
     Trophy, Star, Zap, Flame, Target, BookOpen,
     Medal, Crown, Sparkles, Rocket, Award, Heart,
     CheckCircle, TrendingUp, Clock, Coffee
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { LEVELS, calculateLevel } from '../lib/xpSystem';
 
 interface Badge {
     id: string;
@@ -23,6 +24,8 @@ const BadgesPage: React.FC = () => {
     const [progress] = useProgress();
     const { streak } = useFirestoreStreak();
     const [journal] = useJournal();
+    const { xpData } = useXP();
+    const currentLevel = calculateLevel(xpData.totalXP);
 
     const totalSolved = Object.values(progress).reduce((sum, val) => sum + val, 0);
 
@@ -209,7 +212,20 @@ const BadgesPage: React.FC = () => {
             maxProgress: 5,
             color: 'from-emerald-400 to-green-500',
             rarity: 'rare'
-        }
+        },
+
+        // Level Milestones
+        ...LEVELS.filter(l => l.level >= 2).map(l => ({
+            id: `level-${l.level}`,
+            name: `${l.emoji} ${l.title}`,
+            description: `Reach Level ${l.level} (${l.minXP} XP)`,
+            icon: l.level >= 6 ? Crown : l.level >= 4 ? Rocket : Star,
+            condition: currentLevel.level >= l.level,
+            progress: Math.min(xpData.totalXP, l.minXP),
+            maxProgress: l.minXP,
+            color: l.color,
+            rarity: (l.level >= 6 ? 'legendary' : l.level >= 4 ? 'epic' : l.level >= 3 ? 'rare' : 'common') as Badge['rarity']
+        }))
     ];
 
     const unlockedBadges = badges.filter(b => b.condition);
@@ -263,6 +279,11 @@ const BadgesPage: React.FC = () => {
                     <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
                     <div className="text-2xl font-bold">{streak.bestStreak}</div>
                     <div className="text-sm text-muted-foreground">Best Streak</div>
+                </div>
+                <div className="bg-gradient-to-br from-indigo-500/10 to-violet-600/10 border border-indigo-500/20 p-4 rounded-xl text-center">
+                    <Sparkles className="w-8 h-8 text-indigo-500 mx-auto mb-2" />
+                    <div className="text-2xl font-bold">{xpData.totalXP}</div>
+                    <div className="text-sm text-muted-foreground">Total XP</div>
                 </div>
             </div>
 

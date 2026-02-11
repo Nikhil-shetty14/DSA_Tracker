@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { quotes } from '../data/quotes';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { useFirestoreStreak } from '../hooks/useFirestore';
+import { useFirestoreStreak, useXP } from '../hooks/useFirestore';
 import { useAuth } from '../context/AuthContext';
-import { Flame, Target, Edit2, Save } from 'lucide-react';
+import { Flame, Target, Edit2, Save, Sparkles } from 'lucide-react';
 import Badges from '../components/Badges';
+import { getLevelProgress, getStreakMultiplier } from '../lib/xpSystem';
+import { cn } from '../lib/utils';
 
 const Home: React.FC = () => {
     const [todaysQuote] = useState(() => {
@@ -17,6 +19,9 @@ const Home: React.FC = () => {
     const [tempReason, setTempReason] = useState(reason);
     const { streak } = useFirestoreStreak();
     const { user } = useAuth();
+    const { xpData } = useXP();
+    const levelProgress = getLevelProgress(xpData.totalXP);
+    const streakMultiplier = getStreakMultiplier(streak.currentStreak);
 
     const handleSaveReason = () => {
         setReason(tempReason);
@@ -33,6 +38,43 @@ const Home: React.FC = () => {
                 <p className="text-muted-foreground text-lg">
                     Consistency is the key to mastering Data Structures & Algorithms.
                 </p>
+            </section>
+
+            {/* Level & XP Section */}
+            <section className="bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20 rounded-2xl p-6 relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="text-center sm:text-left">
+                        <div className="text-5xl mb-1">{levelProgress.currentLevel.emoji}</div>
+                        <div className="text-xs text-muted-foreground">Level {levelProgress.currentLevel.level}</div>
+                    </div>
+                    <div className="flex-1 w-full space-y-2">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-bold">{levelProgress.currentLevel.title}</h3>
+                            <div className="flex items-center gap-1.5 text-sm">
+                                <Sparkles className="w-4 h-4 text-yellow-400" />
+                                <span className="font-semibold text-yellow-400">{xpData.totalXP} XP</span>
+                            </div>
+                        </div>
+                        <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                            <div
+                                className={cn("h-full rounded-full transition-all duration-1000 bg-gradient-to-r", levelProgress.currentLevel.color)}
+                                style={{ width: `${levelProgress.progressPercent}%` }}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>
+                                {levelProgress.nextLevel
+                                    ? `${levelProgress.xpInCurrentLevel} / ${levelProgress.xpForNextLevel} XP to ${levelProgress.nextLevel.emoji} ${levelProgress.nextLevel.title}`
+                                    : '🎉 MAX LEVEL!'}
+                            </span>
+                            {streakMultiplier > 1 && (
+                                <span className="text-orange-400 font-medium">
+                                    🔥 {streakMultiplier}x streak bonus
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </section>
 
             {/* Quote Card */}

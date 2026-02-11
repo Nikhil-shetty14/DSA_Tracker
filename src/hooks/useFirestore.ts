@@ -115,3 +115,22 @@ export interface QuizResult {
 export function useQuizResults() {
     return useFirestore<QuizResult[]>('quizResults', []);
 }
+
+// Hook for XP data
+export interface XPData {
+    totalXP: number;
+    level: number;
+}
+
+export function useXP() {
+    const [xpData, setXPData] = useFirestore<XPData>('xpData', { totalXP: 0, level: 1 });
+
+    const addXP = useCallback((amount: number) => {
+        setXPData(prev => ({
+            ...prev,
+            totalXP: prev.totalXP + amount,
+        }));
+    }, [setXPData]);
+
+    return { xpData, setXPData, addXP };
+}

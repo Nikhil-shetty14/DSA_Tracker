@@ -6,6 +6,7 @@ import Journal from './pages/Journal';
 import Profile from './pages/Profile';
 import BadgesPage from './pages/Badges';
 import AptitudeTest from './pages/AptitudeTest';
+import AIMentor from './pages/AIMentor';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -51,6 +52,11 @@ function App() {
             <Route path="/aptitude-test" element={
               <ProtectedRoute>
                 <Layout><AptitudeTest /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/ai-mentor" element={
+              <ProtectedRoute>
+                <Layout><AIMentor /></Layout>
               </ProtectedRoute>
             } />
           </Routes>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { questions, type Question } from '../data/questions';
 import { topics } from '../data/topics';
-import { useQuizResults, type QuizResult } from '../hooks/useFirestore';
+import { useQuizResults, useXP, type QuizResult } from '../hooks/useFirestore';
+import { getQuizXP } from '../lib/xpSystem';
 import {
     BrainCircuit,
     Clock,
@@ -56,6 +57,8 @@ const AptitudeTest: React.FC = () => {
     const [screen, setScreen] = useState<Screen>('topics');
     const [quizState, setQuizState] = useState<QuizState | null>(null);
     const [quizResults, setQuizResults] = useQuizResults();
+    const { addXP } = useXP();
+    const [lastQuizXP, setLastQuizXP] = useState(0);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     // ---------- Timer ----------
@@ -150,6 +153,11 @@ const AptitudeTest: React.FC = () => {
             date: new Date().toISOString(),
             timeTaken,
         };
+
+        // Award XP for quiz completion
+        const earnedXP = getQuizXP(score);
+        addXP(earnedXP);
+        setLastQuizXP(earnedXP);
 
         setQuizResults(prev => [result, ...prev]);
         setScreen('results');
@@ -458,6 +466,10 @@ const AptitudeTest: React.FC = () => {
                             <span className="text-muted-foreground">
                                 {minutes > 0 ? `${minutes}m ` : ''}{seconds}s
                             </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Star className="w-5 h-5 text-yellow-400" />
+                            <span><strong className="text-yellow-400">+{lastQuizXP}</strong> <span className="text-muted-foreground">XP</span></span>
                         </div>
                     </div>
 
